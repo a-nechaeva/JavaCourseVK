@@ -3,9 +3,9 @@ package org.example;
 import java.util.Set;
 
 public class Match {
-    User user;
-    Job job;
-    Integer suggested;
+    private User user;
+    private Job job;
+    private Integer suggested;
 
     public Match(User user, Job job) {
         this.user = user;
@@ -30,7 +30,7 @@ public class Match {
             if (companyTags.contains(skill))
                 countMatching++;
         }
-        if (u.experience < j.experience) countMatching /= 2;
+        if (u.getExperience() < j.getExperience()) countMatching /= 2;
         this.suggested = countMatching;
     }
 

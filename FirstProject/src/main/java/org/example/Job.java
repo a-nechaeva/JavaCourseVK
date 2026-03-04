@@ -3,10 +3,10 @@ package org.example;
 import java.util.*;
 
 public class Job {
-    String title;
-    String company;
-    Set<String> tags = new TreeSet<>();
-    Integer experience;
+    private String title;
+    private String company;
+    private Set<String> tags = new TreeSet<>();
+    private Integer experience;
 
     public Job(String title, String company, String tags, int experience) {
         this.title = title;
@@ -42,5 +42,14 @@ public class Job {
     }
     public Integer getExperience() {
         return experience;
+    }
+    public String toString() {
+        return title + " at " + company;
+    }
+
+    public boolean equals(Object obj) {
+        Job job = (Job) obj;
+        return Objects.equals(title, job.title) && Objects.equals(company, job.company) && Objects.equals(experience, job.experience) &&
+                Objects.equals(tags, job.tags);
     }
 }

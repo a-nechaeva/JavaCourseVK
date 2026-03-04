@@ -3,9 +3,9 @@ package org.example;
 import java.util.*;
 
 public class User {
-    String name;
-    Set<String> skills = new TreeSet<>();
-    Integer experience;
+    private String name;
+    private Set<String> skills = new TreeSet<>();
+    private Integer experience;
 
     public User(String name, String skills, int experience) {
         this.name = name;
@@ -34,5 +34,15 @@ public class User {
 
     public Integer getExperience() {
         return experience;
+    }
+
+    public String toString() {
+        return name + " " + String.join(",", skills) + " " + experience;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        User user = (User) obj;
+        return Objects.equals(name, user.name) && Objects.equals(skills, user.skills) && Objects.equals(experience, user.experience);
     }
 }
