@@ -1,13 +1,11 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Job {
     String title;
     String company;
-    List<String> tags = new ArrayList<>();
+    Set<String> tags = new TreeSet<>();
     Integer experience;
 
     public Job(String title, String company, String tags, int experience) {
@@ -39,7 +37,7 @@ public class Job {
     public String getCompany() {
         return company;
     }
-    public List<String> getTags() {
+    public Set<String> getTags() {
         return tags;
     }
     public Integer getExperience() {
