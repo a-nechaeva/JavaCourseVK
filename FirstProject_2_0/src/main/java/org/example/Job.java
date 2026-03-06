@@ -49,7 +49,9 @@ public class Job {
 
     public boolean equals(Object obj) {
         Job job = (Job) obj;
-        return Objects.equals(title, job.title) && Objects.equals(company, job.company) && Objects.equals(experience, job.experience) &&
-                Objects.equals(tags, job.tags);
+        return Objects.equals(title, job.title);
+    }
+    public int hashCode() {
+        return Objects.hashCode(title);
     }
 }

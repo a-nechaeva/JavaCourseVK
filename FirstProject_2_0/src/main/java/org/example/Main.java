@@ -7,8 +7,8 @@ public class Main {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         String curLine;
-        Set<Job> jobSet = new HashSet<>();
-        Set<User> userSet = new HashSet<>();
+        Set<Job> jobSet = new LinkedHashSet<>();
+        Set<User> userSet = new LinkedHashSet<>();
 
         while (!(curLine = in.nextLine()).equals("exit")){
 
@@ -36,7 +36,7 @@ public class Main {
             } else {
                 if (curLine.charAt(0) == 'j') {
                     // job
-                    if (curLine.charAt(4) == '-') {
+                    if (curLine.charAt(3) == '-') {
                         // job-list
                         for (Job j : jobSet) System.out.println(j.toString());
                     } else {

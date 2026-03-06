@@ -43,6 +43,9 @@ public class User {
     @Override
     public boolean equals(Object obj) {
         User user = (User) obj;
-        return Objects.equals(name, user.name) && Objects.equals(skills, user.skills) && Objects.equals(experience, user.experience);
+        return Objects.equals(name, user.name);
+    }
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }
