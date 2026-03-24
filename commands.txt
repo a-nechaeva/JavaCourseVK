@@ -1,0 +1,4 @@
+user alice --skills=java,ml,linux --exp=2
+user bob --skills=java,java,java --exp=10
+user-list
+exithistory

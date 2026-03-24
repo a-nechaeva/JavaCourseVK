@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,18 +12,93 @@ public class Main {
         String curLine;
 
         //Here we are trying to execute commands from the file only create features
-
         // at the start point
+        String logFileName = "commands.txt";
+        File logFile = new File(logFileName);
+
+        try {
+            if (logFile.exists()) {
+                if (logFile.length() > 0) {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(logFile))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            if (!line.trim().isEmpty()) executeFromFile(line);
+                        }
+                    }
+                }
+            } else {
+                //logFile.getParentFile().mkdirs();
+                logFile.createNewFile();
+                System.out.println("Путь к файлу лога: " + logFile.getAbsolutePath());
+            }
+        } catch (IOException e) {}
+
         // next we read, execute and write down to the file input commands without exit command
         // if we meet history command we print commands from the file
         while (!(curLine = in.nextLine()).equals("exit")){
             executeCommand(curLine);
+            // we need to save curLine in file here
+            try (PrintWriter writer = new PrintWriter(new FileWriter(logFile, true))) {
+                if (!curLine.equals("exit")) writer.println(curLine);
+            } catch (IOException e) {}
+
         }
         System.exit(0);
     }
 
-    public static void executeCommand(String command) {
+    public static void executeFromFile(String command) {
+        if (command.charAt(0) == 'u') {
+            // user
+            if (command.charAt(4) != '-')  {
+                // user alice --skills=java,ml,linux --exp=2
+                String[] userString = command.split("\\s+");
+                String name = userString[1];
+                String experience;
+                String skills;
 
+                if (userString[2].charAt(2) == 's') {
+                    skills = userString[2].substring(9);
+                    experience = userString[3].substring(6);
+                } else {
+                    skills = userString[3].substring(9);
+                    experience = userString[2].substring(6);
+                }
+                userSet.add(new User(name, skills, Integer.parseInt(experience)));
+            }
+        } else {
+            if (command.charAt(0) == 'j') {
+                // job
+                if (command.charAt(3) != '-')  {
+                    // job Backend_Dev --company=VK --tags=java,backend,linux --exp=1
+                    String[] jobString = command.split("\\s+");
+                    String title = jobString[1];
+                    String company = null;
+                    String tags = null;
+                    String experience = null;
+                    for (String s : jobString) {
+                        if (s.charAt(2) == 'c') company = s.substring(10);
+                        if (s.charAt(2) == 't') tags = s.substring(7);
+                        if (s.charAt(2) == 'e') experience = s.substring(6);
+                    }
+                    jobSet.add(new Job(title, company, tags, Integer.parseInt(experience)));
+                }
+            }
+        }
+    }
+
+    public static void executeCommand(String command) {
+        if (command.charAt(0) == 'h') {
+            // here we print commands from the file
+            File logFile = new File("commands.txt");
+            try (BufferedReader reader = new BufferedReader(new FileReader(logFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (!line.trim().isEmpty()) {
+                        System.out.println(line);
+                    }
+                }
+            } catch (IOException e) {}
+        }
         if (command.charAt(0) == 'u') {
             // user
             if (command.charAt(4) == '-') {
