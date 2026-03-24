@@ -29,7 +29,6 @@ public class Main {
             } else {
                 //logFile.getParentFile().mkdirs();
                 logFile.createNewFile();
-                System.out.println("Путь к файлу лога: " + logFile.getAbsolutePath());
             }
         } catch (IOException e) {}
 
@@ -39,7 +38,7 @@ public class Main {
             executeCommand(curLine);
             // we need to save curLine in file here
             try (PrintWriter writer = new PrintWriter(new FileWriter(logFile, true))) {
-                if (!curLine.equals("exit")) writer.println(curLine);
+                if (!curLine.trim().equals("exit")) writer.println(curLine);
             } catch (IOException e) {}
 
         }
@@ -98,6 +97,7 @@ public class Main {
                     }
                 }
             } catch (IOException e) {}
+            return;
         }
         if (command.charAt(0) == 'u') {
             // user
