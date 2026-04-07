@@ -125,7 +125,10 @@ public class Main {
                 // job
                 if (command.charAt(3) == '-') {
                     // job-list
-                    for (Job j : jobSet) System.out.println(j.toString());
+                    //for (Job j : jobSet) System.out.println(j.toString());
+                    jobSet.stream()
+                            .sorted(Comparator.comparing(Job::getTitle, String.CASE_INSENSITIVE_ORDER))
+                            .forEach(System.out::println);
                 } else {
                     // job Backend_Dev --company=VK --tags=java,backend,linux --exp=1
                     String[] jobString = command.split("\\s+");
@@ -141,29 +144,84 @@ public class Main {
                     jobSet.add(new Job(title, company, tags, Integer.parseInt(experience)));
                 }
             } else {
-                //suggest <username>
-                String userName = command.substring(8);
+                if (command.charAt(1) == 'u') {
+                    //suggest <username>
+                    String userName = command.substring(8);
 
-                for (User u: userSet) {
-                    if (u.getName().equals(userName)){
-                        User curUser = u;
-                        Map<Job, Integer> jobMatching = new HashMap<>();
-                        for (Job j: jobSet) {
-                            Match curMatch = new Match(curUser, j);
-                            jobMatching.put(j, curMatch.getSuggested());
+                    for (User u : userSet) {
+                        if (u.getName().equals(userName)) {
+                            User curUser = u;
+                            Map<Job, Integer> jobMatching = new HashMap<>();
+                            for (Job j : jobSet) {
+                                Match curMatch = new Match(curUser, j);
+                                jobMatching.put(j, curMatch.getSuggested());
+                            }
+                            List<Map.Entry<Job, Integer>> topVacancy = jobMatching.entrySet()
+                                    .stream()
+                                    .filter(entry -> entry.getValue() != null && entry.getValue() > 0)
+                                    .sorted(Map.Entry.<Job, Integer>comparingByValue().reversed())
+                                    .limit(2)
+                                    .collect(Collectors.toList());
+
+                            if (!topVacancy.isEmpty()) {
+                                for (Map.Entry<Job, Integer> entry : topVacancy) {
+                                    System.out.println(entry.getKey().toString());
+
+                                }
+                            }
                         }
-                        List<Map.Entry<Job, Integer>> topVacancy = jobMatching.entrySet()
-                                .stream()
-                                .filter(entry -> entry.getValue() != null && entry.getValue() > 0)
-                                .sorted(Map.Entry.<Job, Integer>comparingByValue().reversed())
-                                .limit(2)
+                    }
+                } else {
+                    // stat
+
+                    if (command.charAt(7) == 'e') {
+                        int val = Integer.parseInt(command.substring(11));
+                        jobSet.stream()
+                                .filter(j -> j.getExperience() >= val)
+                                .sorted(Comparator.comparing(Job::getTitle))
+                                .forEach(System.out::println);
+                    }else if (command.charAt(7) == 'm') {
+                        int val = Integer.parseInt(command.substring(13));
+                        Map<User, Integer> userMatchCounts = new HashMap<>();
+
+                        for (User u : userSet) {
+                            int count = 0;
+                            for (Job j : jobSet) {
+                                Match m = new Match(u, j);
+                                if (m.getSuggested() > 0) {
+                                    count++;
+                                }
+                            }
+                            userMatchCounts.put(u, count);
+                        }
+
+                        userMatchCounts.entrySet().stream()
+                                .filter(e -> e.getValue() >= val)
+                                .map(Map.Entry::getKey)
+                                .sorted(Comparator.comparing(User::getName))
+                                .forEach(System.out::println);
+                    }
+                    else if (command.charAt(7) == 't') {
+                        int val = Integer.parseInt(command.substring(18));
+                        Map<String, Long> skillCounts = new HashMap<>();
+                        for (User u : userSet) {
+                            for (String skill : u.getSkills()) {
+                                skillCounts.put(skill, skillCounts.getOrDefault(skill, 0L) + 1);
+                            }
+                        }
+
+                        List<Map.Entry<String, Long>> sortedSkills = skillCounts.entrySet().stream()
+                                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                                 .collect(Collectors.toList());
 
-                        if (!topVacancy.isEmpty()) {
-                            for (Map.Entry<Job, Integer> entry : topVacancy) {
-                                System.out.println(entry.getKey().toString());
+                        List<String> topSkills = sortedSkills.stream()
+                                .limit(val)
+                                .map(Map.Entry::getKey)
+                                .sorted()
+                                .collect(Collectors.toList());
 
-                            }
+                        for (String s : topSkills) {
+                            System.out.println(s);
                         }
                     }
                 }
