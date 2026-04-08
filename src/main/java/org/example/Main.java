@@ -3,16 +3,17 @@ package org.example;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.concurrent.*;
 
 public class Main {
     static Set<Job> jobSet = new LinkedHashSet<>();
     static Set<User> userSet = new LinkedHashSet<>();
+    static ScheduledExecutorService scheduler;
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         String curLine;
 
-        //Here we are trying to execute commands from the file only create features
-        // at the start point
         String logFileName = "commands.txt";
         File logFile = new File(logFileName);
 
@@ -27,22 +28,44 @@ public class Main {
                     }
                 }
             } else {
-                //logFile.getParentFile().mkdirs();
                 logFile.createNewFile();
             }
         } catch (IOException e) {}
 
-        // next we read, execute and write down to the file input commands without exit command
-        // if we meet history command we print commands from the file
+
+        scheduler = Executors.newScheduledThreadPool(1);
+        BestJob suggestionTask = new BestJob(userSet, jobSet);
+
+        scheduler.scheduleAtFixedRate(suggestionTask, 0, 60, TimeUnit.SECONDS);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            scheduler.shutdown();
+            try {
+                if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }));
+
         while (!(curLine = in.nextLine()).equals("exit")){
             executeCommand(curLine);
-            // we need to save curLine in file here
             try (PrintWriter writer = new PrintWriter(new FileWriter(logFile, true))) {
                 if (!curLine.trim().equals("exit")) writer.println(curLine);
             } catch (IOException e) {}
 
         }
-        System.exit(0);
+
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(3, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
     }
 
     public static void executeFromFile(String command) {
