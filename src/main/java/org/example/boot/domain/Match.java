@@ -1,4 +1,4 @@
-package org.example;
+package org.example.boot.domain;
 
 import java.util.Set;
 

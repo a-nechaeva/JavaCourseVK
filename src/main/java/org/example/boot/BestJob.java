@@ -1,4 +1,8 @@
-package org.example;
+package org.example.boot;
+
+import org.example.boot.domain.Job;
+import org.example.boot.domain.Match;
+import org.example.boot.domain.User;
 
 import java.util.*;
 
